@@ -140,7 +140,9 @@ dmypy.json
 cython_debug/
 
 # me
+media/
 records/
 images/
 soloPai.db
 .idea/
+*/migrations/

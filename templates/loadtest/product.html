@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}
+    项目主页
+{% endblock %}
+{% block body %}
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'loadtest:product' %}">soloπ性能测试数据界面化工具</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <div{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="col">
+            <form class="form-horizontal" role="form" action="{% url 'loadtest:product' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="firstname" class="col-sm-2 control-label">项目名称</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="productname" placeholder="请输入项目名称">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lastname" class="col-sm-2 control-label">项目详情</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="productdesc" placeholder="项目详情">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-default">提交</button>
+                    </div>
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <a href="{% url 'loadtest:add_tag' %}">点击生成csv标签</a>
+                    </div>
+                </div>
+            </form>
+            <div class="table-responsive">
+
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>项目ID</th>
+                        <th>项目名称</th>
+                        <th>项目详情</th>
+                        <th>项目创建人</th>
+                        <th>项目创建时间</th>
+                        <th>查看详情</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in products_page %}
+                        <tr>
+                            <td>{{ product.pk }}</td>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.desc }}</td>
+                            <td>{{ product.producter }}</td>
+                            <td>{{ product.created_time }}</td>
+                            <td><a href="{% url 'loadtest:index' product.id %}">查看项目</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <ul class="pagination pagination-lg">
+            {% if all_path.has_previous %}
+                <li><a href="?page={{ all_path.previous_page_number }}">上一页</a></li>
+            {% endif %}
+                <li>&laquo;{{ all_path.number }}/{{ all_path.paginator.num_pages }}&raquo;</li>
+            {% if all_path.has_next %}
+                <li><a href="?page={{ all_path.next_page_number }}">下一页</a></li>
+            {% endif %}
+        </ul>
+    </div>
+{% endblock %}
