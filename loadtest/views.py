@@ -1,18 +1,20 @@
 import os
-import sys
 import csv
 import time
-import base64
-from math import ceil
-from io import BytesIO
 from itertools import islice
-import matplotlib.pyplot as plot
 
+from django.shortcuts import render, redirect, reverse, HttpResponse
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect, reverse
 from django.views.generic import View
 from django.contrib import messages
 from django.conf import settings
+
+from jinja2 import Environment, FileSystemLoader
+from pyecharts.globals import CurrentConfig
+
+CurrentConfig.GLOBAL_ENV = Environment(loader=FileSystemLoader('./templates'))
+import pyecharts.options as opts
+from pyecharts.charts import Line
 from loadtest.models import SoloPitTag, SoloPiFile, Product
 
 
@@ -35,9 +37,9 @@ class ProductView(View):
     def get(self, request):
         page = request.GET.get('page')
         products = Product.objects.all().order_by('-created_time')
-        paginator = Paginator(products,10)
+        paginator = Paginator(products, 10)
         products_page = paginator.get_page(page)
-        return render(request, 'loadtest/product.html', {'products_page':products_page})
+        return render(request, 'loadtest/product.html', {'products_page': products_page})
 
     def post(self, request):
         productname = request.POST.get('productname')
@@ -72,7 +74,8 @@ class IndexView(View):
     def get(self, request, pk):
         page = request.GET.get('page')
         product = Product.objects.get(pk=pk)
-        objects = SoloPiFile.objects.filter(product=product).order_by('-created_time')
+        objects = SoloPiFile.objects.filter(
+            product=product).order_by('-created_time')
         paginator = Paginator(objects, 10)
         all_path = paginator.get_page(page)
         return render(request, 'loadtest/index.html', locals())
@@ -98,68 +101,57 @@ class IndexView(View):
         return redirect(reverse('loadtest:index', args=(pk,)))
 
 
-class ChartView(View):
-    """图表视图"""
+def solo_tags(name):
+    name = name[name.rfind('/') + 1:]
+    new_name = []
+    for i in name.split('_'):
+        new_name += i.split('-')
+    solo_tag = SoloPitTag.objects.filter(cn_name__contains=new_name[0])
+    if len(solo_tag) == 1:
+        return solo_tag.first()
+    else:
+        solo_tag2 = solo_tag.filter(cn_name__contains=new_name[1])
+        return solo_tag2.first()
 
-    def solo_tags(self, name):
-        name = name[name.rfind('/') + 1:]
-        new_name = []
-        for i in name.split('_'):
-            new_name += i.split('-')
-        solo_tag = SoloPitTag.objects.filter(cn_name__contains=new_name[0])
-        if len(solo_tag) == 1:
-            return solo_tag.first()
-        else:
-            solo_tag2 = solo_tag.filter(cn_name__contains=new_name[1])
-            return solo_tag2.first()
 
-    def get(self, request, name):
-        solo_tag = self.solo_tags(name)
-        if not solo_tag:
-            messages.error(request, "获取的文件数据是空的！")
-            return render(request, 'loadtest/show.html', locals())
+def chart(request, name):
+    solo_tag = solo_tags(name)
+    if not solo_tag:
+        messages.error(request, "获取的文件数据是空的！")
+        return render(request, 'loadtest/shows.html')
+    try:
+        title = solo_tag.csv_title
+        cn_name = solo_tag.cn_name
+        with open(name, 'r', encoding='GB2312') as f:
+            csv_data = csv.reader(f)
+            numbers = [float(number)
+                       for _, number, _ in islice(csv_data, 1, None)]
+    except AttributeError:
+        messages.error(request, "获取字段值错误！{}".format(solo_tag))
+        return render(request, 'loadtest/shows.html')
+    c = (
+        Line()
+            .set_global_opts(
+            title_opts=opts.TitleOpts(title=cn_name),
+            tooltip_opts=opts.TooltipOpts(is_show=False),
+            xaxis_opts=opts.AxisOpts(type_="category"),
+            yaxis_opts=opts.AxisOpts(
+                type_="value",
+                axistick_opts=opts.AxisTickOpts(is_show=True),
+                splitline_opts=opts.SplitLineOpts(is_show=True),
+            ),
+        )
+            .add_xaxis(xaxis_data=range(len(numbers)))
+            .add_yaxis(
+            series_name=title,
+            y_axis=numbers,
+            symbol="emptyCircle",
+            is_symbol_show=True,
+            label_opts=opts.LabelOpts(is_show=False),
+        )
+    )
+    return HttpResponse(c.render_embed())
 
-        try:
-            title = solo_tag.csv_title
-            cn_name = solo_tag.cn_name
-        except AttributeError:
-            messages.error(request, "获取字段值错误！{}".format(solo_tag))
-        else:
-            with open(name, 'r', encoding='GB2312') as f:
-                csv_data = csv.reader(f)
-                numbers = [float(number) for _, number, _ in islice(csv_data, 1, None)]
-                max_number = ceil(max(numbers)) + 10
-                min_number = ceil(min(numbers)) - 10 if (ceil(min(numbers)) - 10) < 0 else 0
-                messages.warning(request, "最大值：%s，最小值：%s" % (max_number, min_number))
-                messages.info(request, "X轴详细数据：%s" % numbers)
-                # 设置字体
-                if 'win' in sys.platform:
-                    plot.rcParams['font.sans-serif'] = ['Songti SC']  # 用来正常显示中文标签
-                else:
-                    plot.rcParams['font.sans-serif'] = ['SimHei']  # 用来正常显示中文标签
-                # 显示负数符号
-                plot.rcParams['axes.unicode_minus'] = False
-                # 设置图版
-                plot.figure(dpi=128)
-                plot.title(cn_name)
-                # X，Y最大值
-                plot.xlim((0, len(numbers)))  # X轴界限
-                plot.ylim((min_number, max_number))  # Y轴界限
-                # X，Y名称
-                plot.xlabel('time axis')
-                plot.ylabel(title)
-                # 绘图
-                plot.plot(range(len(numbers)), numbers, 'r', label=title)
-                plot.legend()
-                # 生成图片
-                save_file = BytesIO()
-                plot.savefig(save_file, format='png')
-                save_file.seek(0)
-                save_file_base64 = base64.b64encode(save_file.getvalue())
-                plot.close()
-                if save_file_base64:
-                    img_str = "data:image/png;base64,%s" % save_file_base64.decode('utf-8')
-                    return render(request, 'loadtest/show.html', {'img_str': img_str})
-                else:
-                    messages.error(request, "{}图片不存在！".format(cn_name))
-                    return render(request, 'loadtest/show.html')
+
+def shows(request, name):
+    return render(request, 'loadtest/shows.html', {'name': name})

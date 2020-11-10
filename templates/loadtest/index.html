@@ -54,23 +54,21 @@
                             <th>{{ path.filename }}</th>
                             <th>{{ path.filepath }}</th>
                             <th>{{ path.created_time }}</th>
-                            <th><a href="{% url 'loadtest:chart' path.filepath %}">查看结果</a></th>
+                            <th><a href="{% url 'loadtest:shows' path.filepath %}">查看结果</a></th>
                         </tr>
                     {% endfor %}
                 {% endif %}
                 </tbody>
-
             </table>
         </div>
         <ul class="pagination pagination-lg">
             {% if all_path.has_previous %}
                 <li><a href="?page={{ all_path.previous_page_number }}">上一页</a></li>
             {% endif %}
-                <li>&laquo;{{ all_path.number }}/{{ all_path.paginator.num_pages }}&raquo;</li>
+            <li>&laquo;{{ all_path.number }}/{{ all_path.paginator.num_pages }}&raquo;</li>
             {% if all_path.has_next %}
                 <li><a href="?page={{ all_path.next_page_number }}">下一页</a></li>
             {% endif %}
         </ul>
-
     </div>
 {% endblock %}
