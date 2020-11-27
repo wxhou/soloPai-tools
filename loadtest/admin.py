@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import SoloPitTag, SoloPiFile, Product
+from .models import SoloPiFile, Product
 
 
 # Register your models here.
@@ -7,11 +7,6 @@ from .models import SoloPitTag, SoloPiFile, Product
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'desc', 'producter', 'created_time')
-
-
-@admin.register(SoloPitTag)
-class SoloPitTagAdmin(admin.ModelAdmin):
-    list_display = ('cn_name', 'en_name', 'csv_title')
 
 
 @admin.register(SoloPiFile)

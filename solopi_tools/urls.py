@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='solopi_api')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('solopi/', include('loadtest.urls')),
+    path('api/', include('loadtest.urls')),
+    path('swagger/', schema_view),
 ]

@@ -3,8 +3,8 @@ from django.db import models
 
 # Create your models here.
 
-
 class Product(models.Model):
+    user = models.ForeignKey('auth.User', verbose_name='所属用户', on_delete=models.CASCADE)
     name = models.CharField(max_length=128, unique=True, verbose_name='项目名称')
     desc = models.CharField(max_length=256, verbose_name='项目描述')
     producter = models.CharField(max_length=64, verbose_name='负责人')
@@ -15,18 +15,6 @@ class Product(models.Model):
 
     class Meta:
         verbose_name = verbose_name_plural = '项目管理'
-
-
-class SoloPitTag(models.Model):
-    cn_name = models.CharField(verbose_name='中文名称', max_length=128)
-    en_name = models.CharField(verbose_name='英文名称', max_length=128)
-    csv_title = models.CharField(verbose_name='CSV标题', max_length=128)
-
-    def __str__(self):
-        return self.cn_name
-
-    class Meta:
-        verbose_name = verbose_name_plural = 'CSV标题'
 
 
 class SoloPiFile(models.Model):
