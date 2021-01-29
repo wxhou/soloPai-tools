@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/Users/hoou/.pyenv/versions/3.8.6/bin/python",
+    "editor.snippetSuggestions": "bottom",
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "python.linting.enabled": true
+}

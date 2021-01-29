@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}
+趋势图
+{% endblock title %}
+{% block head %}
+<script src="https://cdn.bootcss.com/jquery/3.0.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://assets.pyecharts.org/assets/echarts.min.js"></script>
+{% endblock head %}
+{% block content %}
+<div id="bar" style="width:1000px; height:600px;"></div>
+{% endblock content %}
+{% block script %}
+<script>
+    $(
+        function () {
+            var chart = echarts.init(document.getElementById('bar'), 'white', { renderer: 'canvas' });
+            $.ajax({
+                type: "GET",
+                url: "{{ request.host_url }}chart/{{ id }}/",
+                dataType: 'json',
+                success: function (result) {
+                    chart.setOption(result);
+                }
+            });
+        }
+    )
+</script>
+{% endblock script %}

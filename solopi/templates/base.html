@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>soloπ{% block title %}
+
+        {% endblock %}</title>
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    {% block head %}
+
+    {% endblock head %}
+</head>
+
+<body>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for('solo.index') }}">soloπ</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class=messages>
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}
+
+        {% endblock %}
+    </div>
+    {% if pagination %}
+    <ul class="pagination pagination-lg">
+        {% if pagination.has_prev %}
+        <li><a href="?page={{ pagination.prev_num }}">上一页</a></li>
+        {% endif %}
+        <li>&laquo;{{ pagination.page }}/{{ pagination.pages }}&raquo;</li>
+        {% if pagination.has_next %}
+        <li><a href="?page={{ pagination.next_num }}">下一页</a></li>
+        {% endif %}
+    </ul>
+    {% endif %}
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% block script %}
+
+    {% endblock script %}
+</body>
+
+</html>

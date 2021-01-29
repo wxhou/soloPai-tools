@@ -1,0 +1,2 @@
+FLASK_APP=solopi
+FLASK_ENV=development
