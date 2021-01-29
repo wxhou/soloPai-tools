@@ -3,23 +3,7 @@
 主页
 {% endblock %}
 
-{% block body %}
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">soloπ</a>
-        </div>
-    </div>
-</nav>
-<div class="container">
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <div{% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %}>{{ message }}
-</div>
-{% endfor %}
-</ul>
-{% endif %}
+{% block content %}
 <div class="col">
     <form class="form-inline" enctype="multipart/form-data" role="form" method="post">
         <div class="form-group">
@@ -33,7 +17,6 @@
     </form>
 </div>
 <div class="table-responsive">
-
     <table class="table table-hover">
         <thead>
             <tr>
@@ -59,15 +42,5 @@
             {% endif %}
         </tbody>
     </table>
-</div>
-<ul class="pagination pagination-lg">
-    {% if pagination.has_prev %}
-    <li><a href="?page={{ pagination.prev_num }}">上一页</a></li>
-    {% endif %}
-    <li>&laquo;{{ pagination.page }}/{{ pagination.pages }}&raquo;</li>
-    {% if pagination.has_next %}
-    <li><a href="?page={{ pagination.next_num }}">下一页</a></li>
-    {% endif %}
-</ul>
 </div>
 {% endblock %}

@@ -20,8 +20,8 @@ class SoloPiTag(db.Model):
     cn_name = db.Column(db.String(128))
     en_name = db.Column(db.String(128))
     csv_title = db.Column(db.String(128))
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    updated = db.Column(db.DateTime, onupdate=datetime.now)
 
     def __repr__(self):
         return self.cn_name
@@ -31,8 +31,8 @@ class SoloPiFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(128))
     filepath = db.Column(db.String(512))
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.now)
+    updated = db.Column(db.DateTime, onupdate=datetime.now)
 
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product = db.relationship('Product', back_populates='solopifiles')

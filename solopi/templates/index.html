@@ -1,77 +1,51 @@
 {% extends 'base.html' %}
 {% block title %}
-    项目主页
+主页
 {% endblock %}
-{% block body %}
-    <nav class="navbar navbar-default" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">soloπ</a>
+{% block content %}
+<div class="col">
+    <form class="form-horizontal" role="form" method="post">
+        <div class="form-group">
+            <label for="firstname" class="col-sm-2 control-label">项目名称</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="productname" placeholder="请输入项目名称">
             </div>
         </div>
-    </nav>
-    <div class="container">
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <div{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</div>
+        <div class="form-group">
+            <label for="lastname" class="col-sm-2 control-label">项目详情</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="productdesc" placeholder="项目详情">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default">提交</button>
+            </div>
+        </div>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>项目ID</th>
+                    <th>项目名称</th>
+                    <th>项目详情</th>
+                    <th>创建时间</th>
+                    <th>查看详情</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.desc }}</td>
+                    <td>{{ product.created }}</td>
+                    <td><a href="{{ url_for('solo.detail',id=product.id) }}">查看项目</a></td>
+                </tr>
                 {% endfor %}
-            </ul>
-        {% endif %}
-        <div class="col">
-            <form class="form-horizontal" role="form" method="post">
-                <div class="form-group">
-                    <label for="firstname" class="col-sm-2 control-label">项目名称</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" name="productname" placeholder="请输入项目名称">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="lastname" class="col-sm-2 control-label">项目详情</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" name="productdesc" placeholder="项目详情">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-default">提交</button>
-                    </div>
-                </div>
-            </form>
-            <div class="table-responsive">
-
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>项目ID</th>
-                        <th>项目名称</th>
-                        <th>项目详情</th>
-                        <th>创建时间</th>
-                        <th>查看详情</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for product in products %}
-                        <tr>
-                            <td>{{ product.id }}</td>
-                            <td>{{ product.name }}</td>
-                            <td>{{ product.desc }}</td>
-                            <td>{{ product.created }}</td>
-                            <td><a href="{{ url_for('solo.detail',id=product.id) }}">查看项目</a></td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <ul class="pagination pagination-lg">
-            {% if pagination.has_prev %}
-                <li><a href="?page={{ pagination.prev_num }}">上一页</a></li>
-            {% endif %}
-                <li>&laquo;{{ pagination.page }}/{{ pagination.pages }}&raquo;</li>
-            {% if pagination.has_next %}
-                <li><a href="?page={{ pagination.next_num }}">下一页</a></li>
-            {% endif %}
-        </ul>
+            </tbody>
+        </table>
     </div>
+</div>
 {% endblock %}

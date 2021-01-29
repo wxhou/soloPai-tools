@@ -5,7 +5,7 @@ from .models import Product, SoloPiFile, SoloPiTag
 from .views import solo_bp
 
 
-def create_app(config_name):
+def create_app():
     app = Flask('solopi')
     app.config.from_pyfile('settings.py')
     register_commands(app)
@@ -18,7 +18,7 @@ def create_app(config_name):
 def register_shell_context(app):
     @app.shell_context_processor
     def make_shell_context():
-        return dict(db=db, Product=Product, SoloPiFile=SoloPiFile)
+        return dict(db=db, Product=Product, SoloPiFile=SoloPiFile, SoloPiTag=SoloPiTag)
 
 
 def register_commands(app):
@@ -37,6 +37,10 @@ def register_commands(app):
     @app.cli.command()
     def initsolopi():
         """Initialize the solopi."""
+        db.drop_all()
+        click.echo("Drop tables.")
+        db.create_all()
+        click.echo("Initialized database.")
         csv_title_cn = {
             '累计全局上行流量': 'global_uplink',
             '累计全局下行流量': 'global_downlink',
@@ -84,6 +88,7 @@ def register_commands(app):
         }
         for k, v in csv_title_cn.items():
             solo = SoloPiTag(cn_name=k, en_name=v, csv_title=csv_title_en[v])
+            print(k, v)
             db.session.add(solo)
         db.session.commit()
         click.echo('Done.')

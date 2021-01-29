@@ -1,7 +1,5 @@
 import os
 import csv
-import time
-from itertools import islice
 from werkzeug.utils import secure_filename
 from flask import current_app as app
 from flask import Blueprint, render_template, flash, url_for, request, redirect
@@ -11,12 +9,9 @@ from pyecharts.charts import Line
 
 from .models import Product, SoloPiTag, SoloPiFile
 from .extensions import db
+from .utils import allowed_file, pathname
 
 solo_bp = Blueprint('solo', __name__)
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
 
 @solo_bp.route('/product', methods=["GET", "POST"])
@@ -49,9 +44,7 @@ def detail(id):
         for file in files:
             if file and allowed_file(file.filename):
                 filename = secure_filename(file.filename)
-                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'],
-                                        str(time.strftime("%Y%m%d%H%M%S",
-                                                          time.localtime())))
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], pathname())
                 if not os.path.exists(filepath):
                     os.makedirs(filepath)
                 file.save(os.path.join(filepath, filename))
@@ -78,27 +71,23 @@ def show(id):
 @solo_bp.route('/chart/<int:id>/')
 def chart(id):
     solo_file = SoloPiFile.query.get(id)
-    tag = SoloPiTag.query.filter(
-        SoloPiTag.en_name.in_(solo_file.filename)).first()
-    if not tag:
-        title = "default"
-    else:
-        title = tag.csv_title
     if not solo_file:
         flash("没有对应的文件数据")
         return redirect(request.referrer)
     _file = os.path.join(solo_file.filepath, solo_file.filename)
     try:
         with open(_file, 'r', encoding='GB2312') as f:
-            data = csv.reader(f)
-            app.logger.warning(list(data))
-            numbers = [float(i[1]) for i in islice(data, 1)]
+            data = list(csv.reader(f))
+            title = data.pop(0)[1]
+            numbers = [float(i[1]) for i in data]
     except AttributeError:
         flash("获取文件数据错误")
         return redirect(request.referrer)
+
     c = (
         Line()
         .set_global_opts(
+            title_opts=opts.TitleOpts(title=title),
             tooltip_opts=opts.TooltipOpts(is_show=False),
             xaxis_opts=opts.AxisOpts(type_="category"),
             yaxis_opts=opts.AxisOpts(
@@ -107,10 +96,10 @@ def chart(id):
                 splitline_opts=opts.SplitLineOpts(is_show=True),
             ),
         )
-        .add_xaxis(xaxis_data=x_data)
+        .add_xaxis(xaxis_data=range(len(numbers)))
         .add_yaxis(
-            series_name="",
-            y_axis=y_data,
+            series_name=title,
+            y_axis=numbers,
             symbol="emptyCircle",
             is_symbol_show=True,
             label_opts=opts.LabelOpts(is_show=False),
