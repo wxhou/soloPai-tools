@@ -147,3 +147,5 @@ soloPai.db
 .idea/
 */migrations/
 *.csv
+.*
+*.db

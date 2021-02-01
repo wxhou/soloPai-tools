@@ -1,5 +1,7 @@
 import time
+from pypinyin import lazy_pinyin
 from flask import current_app
+from .models import SoloPiTag
 
 
 def allowed_file(filename):
@@ -8,3 +10,7 @@ def allowed_file(filename):
 
 def pathname(mat="%Y%m%d%H%M%S"):
     return str(time.strftime(mat, time.localtime()))
+
+
+def to_pinyin(filename):
+    return "".join(lazy_pinyin(filename))
