@@ -2,12 +2,12 @@
 
 >该仓库存储着从soloπ测试工具中提取的测试数据并做出可视图的方法
 
-使用Django开发框架封装的界面化工具
+使用flask开发框架封装的界面化工具
 
 ----
     测试工具：soloπ  version==0.92
     录制数据：soloPi/records
-    绘图工具：matplotlib
+    绘图工具：pyecharts
 ----
 
 # Soloπ提供的各项性能指标介绍
