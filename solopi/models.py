@@ -1,5 +1,7 @@
-from .extensions import db
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 
 class Product(db.Model):
@@ -7,7 +9,8 @@ class Product(db.Model):
     name = db.Column(db.String(128), unique=True)
     desc = db.Column(db.String(512))
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    updated = db.Column(db.DateTime, onupdate=datetime.now,
+    updated = db.Column(db.DateTime,
+                        onupdate=datetime.now,
                         default=datetime.now)
 
     solopifiles = db.relationship('SoloPiFile', back_populates='product')
@@ -22,7 +25,8 @@ class SoloPiTag(db.Model):
     en_name = db.Column(db.String(128))
     csv_title = db.Column(db.String(128))
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    updated = db.Column(db.DateTime, onupdate=datetime.now,
+    updated = db.Column(db.DateTime,
+                        onupdate=datetime.now,
                         default=datetime.now)
 
     def __repr__(self):
@@ -34,7 +38,8 @@ class SoloPiFile(db.Model):
     filename = db.Column(db.String(128))
     filepath = db.Column(db.String(512))
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
-    updated = db.Column(db.DateTime, onupdate=datetime.now,
+    updated = db.Column(db.DateTime,
+                        onupdate=datetime.now,
                         default=datetime.now)
 
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'))

@@ -1,8 +1,7 @@
 import click
 from flask import Flask
-from .extensions import db
-from .models import Product, SoloPiFile, SoloPiTag
-from .views import solo_bp
+from .models import db, Product, SoloPiFile, SoloPiTag
+from .views import bp_solo
 
 
 def create_app():
@@ -11,14 +10,17 @@ def create_app():
     register_commands(app)
     register_shell_context(app)
     db.init_app(app)
-    app.register_blueprint(solo_bp, url_prefix='/')
+    app.register_blueprint(bp_solo, url_prefix='/')
     return app
 
 
 def register_shell_context(app):
     @app.shell_context_processor
     def make_shell_context():
-        return dict(db=db, Product=Product, SoloPiFile=SoloPiFile, SoloPiTag=SoloPiTag)
+        return dict(db=db,
+                    Product=Product,
+                    SoloPiFile=SoloPiFile,
+                    SoloPiTag=SoloPiTag)
 
 
 def register_commands(app):
@@ -28,7 +30,8 @@ def register_commands(app):
         """Initialize the database."""
         if drop:
             click.confirm(
-                'This operation will delete the database, do you want to continue?', abort=True)
+                'This operation will delete the database, do you want to continue?',
+                abort=True)
             db.drop_all()
             click.echo('Drop tables.')
         db.create_all()
@@ -62,7 +65,8 @@ def register_commands(app):
             '帧率': 'FPS',
             '最长延迟时间': 'Maximum_delay_time',
             'PrivateDirty内存-appbrand0-3030': 'PrivateDirty',
-            'PSS内存-appbrand0-3030': 'PSS'}
+            'PSS内存-appbrand0-3030': 'PSS'
+        }
         csv_title_en = {
             'global_uplink': '累计全局上行流量(KB)',
             'global_downlink': '累计全局下行流量(KB)',
@@ -91,4 +95,4 @@ def register_commands(app):
             print(k, v)
             db.session.add(solo)
         db.session.commit()
-        click.echo('Done.')
+        click.echo('InitSoloPi Done.')

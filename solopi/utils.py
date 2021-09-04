@@ -1,14 +1,15 @@
 import time
+import uuid
 from pypinyin import lazy_pinyin
 from flask import current_app
-from .models import SoloPiTag
 
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+    return '.' in filename and filename.rsplit(
+        '.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
 
-def pathname(mat="%Y%m%d%H%M%S"):
+def pathname(mat="%Y%m%d"):
     return str(time.strftime(mat, time.localtime()))
 
 

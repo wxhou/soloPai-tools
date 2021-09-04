@@ -4,6 +4,31 @@
 
 使用flask开发框架封装的界面化工具
 
+## 使用步骤
+
+### 初始化
+
+初始化数据库
+
+```shell
+flask initdb 
+```
+
+初始化工具数据
+```shell
+flask initsolopi
+```
+
+运行项目
+```shell
+flask run
+```
+
+打开首页
+
+http://127.0.0.1:5000/product/
+
+
 ----
     测试工具：soloπ  version==0.92
     录制数据：soloPi/records
